@@ -144,24 +144,10 @@ public class ClassFile implements Serializable {
     -                                                                      -
     - Desc:          output a jasmin assembly file                         -
     -----------------------------------------------------------------------*/
-   public void jasmin() {
+   public void jasmin(OutputStream outStream) {
       try{
-         // jasmine uses a ".j" extension by default
-         String name = browseClass() + ".j";
-         String fileName = parseFileDir(name) + parseFileName(name) + "." + parseFileExt(name);
-
-         // make sure there is a place to put it
-         if (!parseFileDir(name).equals("")) {
-            // test if directory for the class exists
-            File f = new File("jasper.out" + File.separatorChar + parseFileDir(name));
-            fileName = "jasper.out" + File.separatorChar + fileName;
-
-            // if the directory path does exist, then create it under the current directory
-            if (!f.exists()) f.mkdirs();
-         }
-
          // open up the output stream to write the file
-         PrintStream out = new PrintStream(new FileOutputStream(fileName));
+         PrintStream out = new PrintStream(outStream);
 
          // print the .source directive
          attributes.jasmin(out);
@@ -187,6 +173,32 @@ public class ClassFile implements Serializable {
 
          // print the .method directives
          methods.jasmin(out);
+
+         // echo that the jasmine file has been completed
+
+      } catch (IOException e) {
+         // report the error
+         System.out.println(e);
+      }
+   }
+
+   public void jasmin() {
+      try{
+         // jasmine uses a ".j" extension by default
+         String name = browseClass() + ".j";
+         String fileName = parseFileDir(name) + parseFileName(name) + "." + parseFileExt(name);
+
+         // make sure there is a place to put it
+         if (!parseFileDir(name).equals("")) {
+            // test if directory for the class exists
+            File f = new File("jasper.out" + File.separatorChar + parseFileDir(name));
+            fileName = "jasper.out" + File.separatorChar + fileName;
+
+            // if the directory path does exist, then create it under the current directory
+            if (!f.exists()) f.mkdirs();
+         }
+
+         jasmin(new FileOutputStream(fileName));
 
          // echo that the jasmine file has been completed
          System.out.println("Generated: " + fileName);
